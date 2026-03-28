@@ -123,6 +123,12 @@
       animation-delay: -4s;
     }
 
+    body.random-chaos .bg-scene .orb {
+      opacity: 0.62;
+      filter: blur(1px) saturate(1.5);
+      animation-duration: 8s;
+    }
+
     @keyframes driftUp {
       0% {
         transform: translateY(0) translateX(0) scale(0.95);
@@ -449,6 +455,103 @@
       overflow: hidden;
     }
 
+    .random-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 75;
+      background: radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 244, 186, 0.2) 18%, rgba(255, 117, 87, 0.12) 35%, rgba(3, 5, 13, 0) 62%);
+      opacity: 0;
+      transform: scale(0.7);
+    }
+
+    .random-flash.active {
+      animation: randomFlashPulse 620ms ease-out;
+    }
+
+    @keyframes randomFlashPulse {
+      0% {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+      30% {
+        opacity: 1;
+        transform: scale(1.03);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.26);
+      }
+    }
+
+    .dance-stage {
+      position: fixed;
+      left: 50%;
+      bottom: 72px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 90;
+      display: none;
+      text-align: center;
+      padding: 10px 16px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(20, 25, 45, 0.86), rgba(52, 14, 35, 0.82));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 30px rgba(255, 200, 89, 0.35);
+      min-width: 170px;
+    }
+
+    .dance-stage.active {
+      display: block;
+      animation: stageBounceIn 280ms ease-out;
+    }
+
+    .dance-sprite {
+      width: 96px;
+      height: 96px;
+      image-rendering: pixelated;
+      animation: pokemonDance 720ms ease-in-out infinite;
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.55));
+    }
+
+    .dance-caption {
+      margin: 4px 0 0;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #ffe3a0;
+      text-shadow: 0 0 8px rgba(255, 191, 71, 0.75);
+    }
+
+    @keyframes stageBounceIn {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(22px) scale(0.86);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+    }
+
+    @keyframes pokemonDance {
+      0% {
+        transform: translateX(-10px) rotate(-8deg) translateY(0);
+      }
+      25% {
+        transform: translateX(10px) rotate(8deg) translateY(-7px);
+      }
+      50% {
+        transform: translateX(-6px) rotate(-7deg) translateY(0);
+      }
+      75% {
+        transform: translateX(9px) rotate(7deg) translateY(-5px);
+      }
+      100% {
+        transform: translateX(-10px) rotate(-8deg) translateY(0);
+      }
+    }
+
     .spark {
       position: absolute;
       width: 8px;
@@ -599,6 +702,11 @@
   </div>
 
   <div id="sparkLayer" class="spark-layer" aria-hidden="true"></div>
+  <div id="randomFlash" class="random-flash" aria-hidden="true"></div>
+  <div id="danceStage" class="dance-stage" aria-hidden="true">
+    <img id="danceSprite" class="dance-sprite" src="" alt="Dancing Pokemon" />
+    <p id="danceCaption" class="dance-caption"></p>
+  </div>
 
   <footer class="app-footer">Pokédex SPA • Client-side routes: Home / Favorites / About • Built with PokéAPI</footer>
 
@@ -635,6 +743,10 @@
     const partyList = document.getElementById('partyList');
     const clearPartyBtn = document.getElementById('clearPartyBtn');
     const sparkLayer = document.getElementById('sparkLayer');
+    const randomFlash = document.getElementById('randomFlash');
+    const danceStage = document.getElementById('danceStage');
+    const danceSprite = document.getElementById('danceSprite');
+    const danceCaption = document.getElementById('danceCaption');
 
     const profileMessage = document.getElementById('profileMessage');
     const usernameInput = document.getElementById('usernameInput');
@@ -655,6 +767,8 @@
     let shinyMode = localStorage.getItem('trainer_shiny') === 'true';
     let party = JSON.parse(localStorage.getItem('trainer_party') || '[]');
     let challengeTarget = localStorage.getItem('trainer_challenge') || '';
+    let randomChaosTimer = null;
+    let danceTimer = null;
 
     const placeholderBase = 'Enter Pokémon name...';
     let cursorVisible = true;
@@ -743,6 +857,43 @@
         sparkLayer.appendChild(spark);
         setTimeout(() => spark.remove(), 760);
       }
+    }
+
+    function triggerRandomBackgroundBoost() {
+      document.body.classList.add('random-chaos');
+      randomFlash.classList.remove('active');
+      void randomFlash.offsetWidth;
+      randomFlash.classList.add('active');
+      if (randomChaosTimer) {
+        clearTimeout(randomChaosTimer);
+      }
+      randomChaosTimer = setTimeout(() => {
+        document.body.classList.remove('random-chaos');
+      }, 2200);
+    }
+
+    function isDancePokemon(name) {
+      const dancers = ['pikachu', 'jigglypuff', 'mr-mime', 'hitmontop', 'ludicolo', 'quaquaval', 'bellossom'];
+      return dancers.includes(name.toLowerCase());
+    }
+
+    function danceSpriteUrl(data) {
+      if (data.id <= 649) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${data.id}.gif`;
+      }
+      return data.sprites.front_default || data.sprites.other?.['official-artwork']?.front_default || '';
+    }
+
+    function triggerDance(data) {
+      danceSprite.src = danceSpriteUrl(data);
+      danceCaption.textContent = `${data.name} dance party!`;
+      danceStage.classList.add('active');
+      if (danceTimer) {
+        clearTimeout(danceTimer);
+      }
+      danceTimer = setTimeout(() => {
+        danceStage.classList.remove('active');
+      }, 3800);
     }
 
     function rewardCatch(data, source) {
@@ -905,6 +1056,14 @@
       const primaryType = data.types?.[0]?.type?.name || 'normal';
       setBackgroundForType(primaryType);
       playAppearanceSound();
+      if (source === 'random') {
+        triggerRandomBackgroundBoost();
+        if (isDancePokemon(data.name)) {
+          triggerDance(data);
+        } else {
+          danceStage.classList.remove('active');
+        }
+      }
       rewardCatch(data, source);
       compareResults.style.display = 'none';
       results.classList.remove('empty');
