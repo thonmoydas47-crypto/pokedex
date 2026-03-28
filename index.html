@@ -330,6 +330,146 @@
       margin: 0;
     }
 
+    .trainer-hud {
+      margin: 0 0 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .trainer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trainer-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    .trainer-badge {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #eaf3ff;
+    }
+
+    .xp-wrap {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .xp-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #20e3b2 0%, #29b6f6 100%);
+      transition: width 280ms ease;
+    }
+
+    .challenge-box {
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 15, 28, 0.52);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .challenge-line {
+      font-size: 0.86rem;
+      color: #e4efff;
+    }
+
+    .mini-btn {
+      border: none;
+      border-radius: 9px;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: linear-gradient(145deg, #0ea5e9, #2563eb);
+      cursor: pointer;
+    }
+
+    .party-box {
+      margin: 12px 0 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 15, 28, 0.52);
+      padding: 10px;
+    }
+
+    .party-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: #e4efff;
+    }
+
+    .party-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .party-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-transform: capitalize;
+      font-size: 0.8rem;
+    }
+
+    .party-chip img {
+      width: 24px;
+      height: 24px;
+      image-rendering: pixelated;
+    }
+
+    .spark-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 80;
+      overflow: hidden;
+    }
+
+    .spark {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, #ffe066 60%, rgba(255, 224, 102, 0) 100%);
+      animation: sparkFly 750ms ease-out forwards;
+      box-shadow: 0 0 10px rgba(255, 230, 130, 0.8);
+    }
+
+    @keyframes sparkFly {
+      from {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(0.2);
+      }
+    }
+
     @media (max-width: 420px) {
       .pokedex-card {
         padding: 18px;
@@ -338,6 +478,10 @@
         width: 100%;
       }
       .search-group {
+        grid-template-columns: 1fr;
+      }
+
+      .trainer-row {
         grid-template-columns: 1fr;
       }
     }
@@ -363,10 +507,40 @@
       <h1>Pokédex 🟠</h1>
       <p style="text-align:center; margin: 0 0 10px; font-size: 0.9rem; color: rgba(235,235,235,0.9);">Catch stats, compare favorites, and smash Random for surprise themes.</p>
       <p style="text-align:center; margin: 0 0 16px; font-size: 0.82rem; color: rgba(235,235,235,0.78);">Tip: try names like pikachu, gengar, or mew.</p>
+      <section class="trainer-hud" aria-label="Trainer game panel">
+        <div class="trainer-row">
+          <div class="trainer-badges">
+            <span class="trainer-badge">Streak: <strong id="streakValue">0</strong></span>
+            <span class="trainer-badge">XP: <strong id="xpValue">0</strong></span>
+            <span class="trainer-badge">Level: <strong id="levelValue">1</strong></span>
+          </div>
+          <label style="font-size:0.78rem; color:#d7ecff; display:flex; align-items:center; gap:6px;">
+            <input id="shinyToggle" type="checkbox" />
+            Shiny Mode
+          </label>
+        </div>
+        <div class="xp-wrap" aria-hidden="true"><div id="xpFill" class="xp-fill"></div></div>
+        <div class="challenge-box">
+          <div id="challengeText" class="challenge-line">Challenge loading...</div>
+          <div style="display:flex; gap:8px;">
+            <button id="newChallengeBtn" type="button" class="mini-btn">New Challenge</button>
+            <span id="challengeStatus" style="font-size:0.78rem; color:#93ffd8; align-self:center;"></span>
+          </div>
+        </div>
+      </section>
       <section class="search-group" aria-label="Search form">
         <input id="pokemonInput" type="text" placeholder="Enter Pokémon name..." aria-label="Pokémon name" />
         <button id="searchBtn" type="button" aria-label="Search Pokémon">Search</button>
         <button id="randomBtn" type="button" aria-label="Random Pokémon">Random</button>
+      </section>
+      <section class="party-box" aria-label="Party builder">
+        <div class="party-head">
+          <strong>Party Builder (max 3)</strong>
+          <button id="clearPartyBtn" type="button" class="mini-btn" style="background: linear-gradient(145deg,#ff595e,#d62839);">Clear Party</button>
+        </div>
+        <div id="partyList" class="party-list">
+          <em style="color:#bfd3e4; font-size:0.84rem;">No party members yet.</em>
+        </div>
       </section>
       <section class="compare-block" aria-label="Compare mode">
         <h3 style="margin: 0 0 10px; font-size: 1rem; color: #ededed; text-align:center;">Compare Mode</h3>
@@ -424,6 +598,8 @@
     <div id="detailCard" class="detail-card"></div>
   </div>
 
+  <div id="sparkLayer" class="spark-layer" aria-hidden="true"></div>
+
   <footer class="app-footer">Pokédex SPA • Client-side routes: Home / Favorites / About • Built with PokéAPI</footer>
 
   <script>
@@ -448,6 +624,17 @@
     const compareBtn = document.getElementById('compareBtn');
     const results = document.getElementById('results');
     const compareResults = document.getElementById('compareResults');
+    const streakValue = document.getElementById('streakValue');
+    const xpValue = document.getElementById('xpValue');
+    const levelValue = document.getElementById('levelValue');
+    const xpFill = document.getElementById('xpFill');
+    const shinyToggle = document.getElementById('shinyToggle');
+    const challengeText = document.getElementById('challengeText');
+    const challengeStatus = document.getElementById('challengeStatus');
+    const newChallengeBtn = document.getElementById('newChallengeBtn');
+    const partyList = document.getElementById('partyList');
+    const clearPartyBtn = document.getElementById('clearPartyBtn');
+    const sparkLayer = document.getElementById('sparkLayer');
 
     const profileMessage = document.getElementById('profileMessage');
     const usernameInput = document.getElementById('usernameInput');
@@ -463,6 +650,11 @@
 
     let currentUser = null;
     let currentUserFavorites = [];
+    let catchStreak = Number(localStorage.getItem('trainer_streak') || 0);
+    let trainerXp = Number(localStorage.getItem('trainer_xp') || 0);
+    let shinyMode = localStorage.getItem('trainer_shiny') === 'true';
+    let party = JSON.parse(localStorage.getItem('trainer_party') || '[]');
+    let challengeTarget = localStorage.getItem('trainer_challenge') || '';
 
     const placeholderBase = 'Enter Pokémon name...';
     let cursorVisible = true;
@@ -473,6 +665,98 @@
         cursorVisible = !cursorVisible;
       }
     }, 500);
+
+    function randomChallengeName() {
+      const pool = ['pikachu', 'eevee', 'charizard', 'gengar', 'lucario', 'snorlax', 'greninja', 'gardevoir', 'dragonite', 'mew'];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function setChallenge(targetName) {
+      challengeTarget = targetName;
+      localStorage.setItem('trainer_challenge', challengeTarget);
+      challengeText.textContent = `Challenge: catch ${challengeTarget.toUpperCase()} for +40 XP bonus`;
+      challengeStatus.textContent = '';
+    }
+
+    function syncTrainerHud() {
+      const level = Math.floor(trainerXp / 100) + 1;
+      const progress = trainerXp % 100;
+      streakValue.textContent = String(catchStreak);
+      xpValue.textContent = String(trainerXp);
+      levelValue.textContent = String(level);
+      xpFill.style.width = `${progress}%`;
+      shinyToggle.checked = shinyMode;
+    }
+
+    function saveTrainerState() {
+      localStorage.setItem('trainer_streak', String(catchStreak));
+      localStorage.setItem('trainer_xp', String(trainerXp));
+      localStorage.setItem('trainer_shiny', String(shinyMode));
+      localStorage.setItem('trainer_party', JSON.stringify(party));
+    }
+
+    function renderParty() {
+      partyList.innerHTML = '';
+      if (party.length === 0) {
+        partyList.innerHTML = '<em style="color:#bfd3e4; font-size:0.84rem;">No party members yet.</em>';
+        return;
+      }
+      party.forEach((member) => {
+        const chip = document.createElement('span');
+        chip.className = 'party-chip';
+        chip.innerHTML = `<img src="${member.sprite}" alt="${member.name}" />${member.name}`;
+        partyList.appendChild(chip);
+      });
+    }
+
+    function addToParty(data) {
+      if (party.some((p) => p.id === data.id)) {
+        showMessage(`${data.name} is already in your party.`);
+        return;
+      }
+      if (party.length >= 3) {
+        showMessage('Party is full. Clear it or replace a member.', true);
+        return;
+      }
+      party.push({
+        id: data.id,
+        name: data.name,
+        sprite: data.sprites.front_default || data.sprites.front_shiny || ''
+      });
+      saveTrainerState();
+      renderParty();
+      showMessage(`${data.name} joined your party.`);
+    }
+
+    function sparkBurst() {
+      const centerX = Math.round(window.innerWidth / 2);
+      const centerY = 140;
+      for (let i = 0; i < 14; i += 1) {
+        const spark = document.createElement('span');
+        spark.className = 'spark';
+        const angle = (Math.PI * 2 * i) / 14;
+        const distance = 26 + Math.random() * 70;
+        spark.style.left = `${centerX}px`;
+        spark.style.top = `${centerY}px`;
+        spark.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+        sparkLayer.appendChild(spark);
+        setTimeout(() => spark.remove(), 760);
+      }
+    }
+
+    function rewardCatch(data, source) {
+      catchStreak += 1;
+      trainerXp += source === 'random' ? 18 : 12;
+      if (data.name.toLowerCase() === challengeTarget.toLowerCase()) {
+        trainerXp += 40;
+        challengeStatus.textContent = 'Challenge completed. Bonus XP earned!';
+        setTimeout(() => setChallenge(randomChallengeName()), 900);
+      }
+      syncTrainerHud();
+      saveTrainerState();
+      sparkBurst();
+    }
 
     function setActiveView(view) {
       [homeView, favoritesView, profileView, aboutView].forEach((panel) => {
@@ -507,6 +791,11 @@
 
     setActiveView('homeView');
     routeFromHash();
+    if (!challengeTarget) {
+      setChallenge(randomChallengeName());
+    }
+    syncTrainerHud();
+    renderParty();
 
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
     const audioCtx = audioContextClass ? new audioContextClass() : null;
@@ -612,29 +901,34 @@
     }
 
     function showPokemon(data, options = {}) {
-      const { showRawData = true } = options;
+      const { showRawData = true, source = 'search' } = options;
       const primaryType = data.types?.[0]?.type?.name || 'normal';
       setBackgroundForType(primaryType);
       playAppearanceSound();
+      rewardCatch(data, source);
       compareResults.style.display = 'none';
       results.classList.remove('empty');
       const heightM = (data.height / 10).toFixed(1);
       const weightKg = (data.weight / 10).toFixed(1);
+      const spriteSrc = shinyMode
+        ? (data.sprites.front_shiny || data.sprites.other?.['official-artwork']?.front_default || data.sprites.front_default || '')
+        : (data.sprites.front_default || data.sprites.other?.['official-artwork']?.front_default || '');
 
       const typesHtml = data.types.map((x) => badge(x.type.name)).join('');
 
       results.classList.remove('empty');
       results.innerHTML = `
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
-          <img src="${data.sprites.front_default || data.sprites.other?.['official-artwork']?.front_default || ''}" alt="${data.name} sprite" width="96" height="96" style="border:2px solid rgba(255,255,255,0.2); border-radius:12px; background:rgba(255,255,255,0.05);" />
+          <img src="${spriteSrc}" alt="${data.name} sprite" width="96" height="96" style="border:2px solid rgba(255,255,255,0.2); border-radius:12px; background:rgba(255,255,255,0.05);" />
           <div>
             <h2 style="margin:0;font-size:1.4rem;text-transform:capitalize;">${data.name}</h2>
             <div>${typesHtml}</div>
           </div>
         </div>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button id="detailBtn" style="flex:1; padding:8px 10px; border:none; border-radius:10px; background:#3887eb; color:#fff;">View detail</button>
           <button id="favoriteBtn" style="flex:1; padding:8px 10px; border:none; border-radius:10px; background:#28a745; color:#fff;">Save favorite</button>
+          <button id="partyBtn" style="flex:1; padding:8px 10px; border:none; border-radius:10px; background:#f59e0b; color:#fff;">Add to party</button>
         </div>
         <p style="margin:0.4rem 0; color:#ddd;">Height: <strong>${heightM} m</strong>, Weight: <strong>${weightKg} kg</strong></p>
         ${showRawData ? `<p style="font-size:0.9rem; color:rgba(235,235,235,0.78); margin:0.2rem 0 8px;">Raw JSON: <a href="https://pokeapi.co/api/v2/pokemon/${data.id}" target="_blank" style="color:#5bdbff;">Open in browser</a></p>
@@ -646,6 +940,9 @@
       });
       document.getElementById('favoriteBtn').addEventListener('click', () => {
         addFavoritePokemon(data);
+      });
+      document.getElementById('partyBtn').addEventListener('click', () => {
+        addToParty(data);
       });
     }
 
@@ -908,14 +1205,37 @@
         showMessage('Please enter a Pokémon name to search.', true);
         return;
       }
-      fetchPokemon(name);
+      fetchPokemon(name, { source: 'search' });
     }
 
     randomBtn.addEventListener('click', () => {
       const randomId = Math.floor(Math.random() * 1010) + 1;
       input.value = randomId;
       applyRandomTheme();
-      fetchPokemon(randomId, { showRawData: false });
+      fetchPokemon(randomId, { showRawData: false, source: 'random' });
+    });
+
+    shinyToggle.addEventListener('change', () => {
+      shinyMode = shinyToggle.checked;
+      saveTrainerState();
+    });
+
+    newChallengeBtn.addEventListener('click', () => {
+      setChallenge(randomChallengeName());
+    });
+
+    clearPartyBtn.addEventListener('click', () => {
+      party = [];
+      saveTrainerState();
+      renderParty();
+      showMessage('Party cleared. Build a new squad!');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/') {
+        e.preventDefault();
+        input.focus();
+      }
     });
 
     compareBtn.addEventListener('click', comparePokemon);
