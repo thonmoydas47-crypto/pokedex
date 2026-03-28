@@ -9,24 +9,15 @@
       --background: #0b0b0f;
       --panel: #13131a;
       --red: #e12724;
+      --accent: #e12724;
+      --accent-2: #4268f5;
+      --dynamic-glow: #2c001a;
       --light: #f5f5f5;
       --shadow: rgba(0, 0, 0, 0.6);
     }
 
     * {
       box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at 20% 20%, #2c001a 0%, #0b0b0f 42%, #020204 100%);
-      color: var(--light);
-      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
     }
 
     .top-nav {
@@ -63,13 +54,85 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at 20% 20%, #2c001a 0%, #0b0b0f 42%, #020204 100%);
+      background: radial-gradient(circle at 20% 20%, var(--dynamic-glow) 0%, #0b0b0f 42%, #020204 100%);
       color: var(--light);
       font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       align-items: flex-start;
       justify-content: center;
       padding: 70px 24px 24px;
+      transition: background 500ms ease;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-scene .orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(2px);
+      opacity: 0.35;
+      mix-blend-mode: screen;
+      animation: driftUp linear infinite;
+    }
+
+    .bg-scene .orb:nth-child(1) {
+      width: 180px;
+      height: 180px;
+      left: 4%;
+      bottom: -220px;
+      background: radial-gradient(circle at 30% 30%, #ffd166, #ef476f);
+      animation-duration: 18s;
+      animation-delay: -2s;
+    }
+
+    .bg-scene .orb:nth-child(2) {
+      width: 110px;
+      height: 110px;
+      left: 22%;
+      bottom: -140px;
+      background: radial-gradient(circle at 30% 30%, #7ee8fa, #80ff72);
+      animation-duration: 14s;
+      animation-delay: -6s;
+    }
+
+    .bg-scene .orb:nth-child(3) {
+      width: 140px;
+      height: 140px;
+      right: 18%;
+      bottom: -170px;
+      background: radial-gradient(circle at 30% 30%, #f72585, #4361ee);
+      animation-duration: 16s;
+      animation-delay: -8s;
+    }
+
+    .bg-scene .orb:nth-child(4) {
+      width: 220px;
+      height: 220px;
+      right: 2%;
+      bottom: -260px;
+      background: radial-gradient(circle at 30% 30%, #ff9e00, #ff2e63);
+      animation-duration: 20s;
+      animation-delay: -4s;
+    }
+
+    @keyframes driftUp {
+      0% {
+        transform: translateY(0) translateX(0) scale(0.95);
+      }
+      50% {
+        transform: translateY(-52vh) translateX(26px) scale(1.05);
+      }
+      100% {
+        transform: translateY(-110vh) translateX(-18px) scale(0.9);
+      }
     }
 
     .pokedex-card {
@@ -79,6 +142,8 @@
       background: linear-gradient(180deg, #1b1b25 0%, #15151b 45%, #181824 100%);
       box-shadow: 0 14px 35px var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
       padding: 28px;
+      position: relative;
+      z-index: 2;
     }
 
     h1 {
@@ -122,17 +187,28 @@
       min-height: 46px;
       border: none;
       border-radius: 12px;
-      background: linear-gradient(145deg, #f33b36, #d21715);
+      background: linear-gradient(145deg, var(--accent), #d21715);
       color: white;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 300ms ease;
     }
 
     #randomBtn {
-      background: linear-gradient(145deg, #4268f5, #1f3dcc);
+      background: linear-gradient(145deg, var(--accent-2), #1f3dcc);
+      animation: randomPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes randomPulse {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-2px);
+      }
     }
 
     .search-group button:hover {
@@ -268,6 +344,13 @@
   </style>
 </head>
 <body>
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb"></span>
+    <span class="orb"></span>
+    <span class="orb"></span>
+    <span class="orb"></span>
+  </div>
+
   <nav class="top-nav" aria-label="App navigation">
     <a id="navHome" href="#home" class="active">Home</a>
     <a id="navFavorites" href="#favorites">Favorites</a>
@@ -278,8 +361,8 @@
   <main class="pokedex-card" role="main" aria-label="Pokédex application">
     <section id="homeView">
       <h1>Pokédex 🟠</h1>
-      <p style="text-align:center; margin: 0 0 12px; font-size: 0.9rem; color: rgba(235,235,235,0.85);">Event listeners are watching for clicks and keypresses. DOM manipulation updates page content after load. CSS animations move stuff without JS. UX includes loading states + errors.</p>
-      <p style="text-align:center; margin: 0 0 16px; font-size: 0.82rem; color: rgba(235,235,235,0.78);">fetch() calls pokeapi.co/api/v2/pokemon/<code>name</code>, async/await waits before continuing, "then" runs when data arrives.</p>
+      <p style="text-align:center; margin: 0 0 10px; font-size: 0.9rem; color: rgba(235,235,235,0.9);">Catch stats, compare favorites, and smash Random for surprise themes.</p>
+      <p style="text-align:center; margin: 0 0 16px; font-size: 0.82rem; color: rgba(235,235,235,0.78);">Tip: try names like pikachu, gengar, or mew.</p>
       <section class="search-group" aria-label="Search form">
         <input id="pokemonInput" type="text" placeholder="Enter Pokémon name..." aria-label="Pokémon name" />
         <button id="searchBtn" type="button" aria-label="Search Pokémon">Search</button>
@@ -308,7 +391,6 @@
 
     <section id="profileView" style="display:none; color: #e7e7e7;">
       <h2 style="margin-top:0; text-align:center;">Profile & Auth</h2>
-      <p style="font-size:0.9rem; color:#ccc;">auth = who are you? authz = what are you allowed to do?</p>
       <div id="profileMessage" style="margin-bottom:12px; color:#9fd6ff;"></div>
       <div id="loginBlock">
         <h3 style="margin:0 0 8px;">Login / Signup</h3>
@@ -445,7 +527,21 @@
 
     function setBackgroundForType(type) {
       const base = typeColors[type.toLowerCase()] || '#0b0b0f';
-      document.body.style.background = `radial-gradient(circle at 30% 20%, ${base}88 0%, #0b0b0f 45%, #020204 100%)`;
+      document.documentElement.style.setProperty('--dynamic-glow', `${base}88`);
+    }
+
+    function applyRandomTheme() {
+      const themes = [
+        { accent: '#ff6b6b', accent2: '#4ecdc4', glow: '#24245a' },
+        { accent: '#00bbf9', accent2: '#fee440', glow: '#16233f' },
+        { accent: '#f15bb5', accent2: '#00f5d4', glow: '#401b49' },
+        { accent: '#ff9f1c', accent2: '#2ec4b6', glow: '#2f1f16' },
+        { accent: '#8ac926', accent2: '#ff595e', glow: '#1d2d2f' }
+      ];
+      const next = themes[Math.floor(Math.random() * themes.length)];
+      document.documentElement.style.setProperty('--accent', next.accent);
+      document.documentElement.style.setProperty('--accent-2', next.accent2);
+      document.documentElement.style.setProperty('--dynamic-glow', next.glow);
     }
 
     const typeColors = {
@@ -515,7 +611,8 @@
       results.innerHTML = `<p class="message" style="color:${isError ? '#ffacac' : '#dfe9ff'}">${text}</p>`;
     }
 
-    function showPokemon(data) {
+    function showPokemon(data, options = {}) {
+      const { showRawData = true } = options;
       const primaryType = data.types?.[0]?.type?.name || 'normal';
       setBackgroundForType(primaryType);
       playAppearanceSound();
@@ -540,8 +637,8 @@
           <button id="favoriteBtn" style="flex:1; padding:8px 10px; border:none; border-radius:10px; background:#28a745; color:#fff;">Save favorite</button>
         </div>
         <p style="margin:0.4rem 0; color:#ddd;">Height: <strong>${heightM} m</strong>, Weight: <strong>${weightKg} kg</strong></p>
-        <p style="font-size:0.9rem; color:rgba(235,235,235,0.78); margin:0.2rem 0 8px;">Raw JSON: <a href="https://pokeapi.co/api/v2/pokemon/${data.id}" target="_blank" style="color:#5bdbff;">Open in browser</a></p>
-        <pre style="background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px; margin-top:10px; max-height:240px; overflow:auto; font-size:0.78rem;">${JSON.stringify(data, null, 2)}</pre>
+        ${showRawData ? `<p style="font-size:0.9rem; color:rgba(235,235,235,0.78); margin:0.2rem 0 8px;">Raw JSON: <a href="https://pokeapi.co/api/v2/pokemon/${data.id}" target="_blank" style="color:#5bdbff;">Open in browser</a></p>
+        <pre style="background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px; margin-top:10px; max-height:240px; overflow:auto; font-size:0.78rem;">${JSON.stringify(data, null, 2)}</pre>` : ''}
       `;
       document.getElementById('detailBtn').addEventListener('click', async () => {
         const chain = await loadEvolutionChain(data.species.url);
@@ -561,14 +658,14 @@
       return res.json();
     }
 
-    async function fetchPokemon(query) {
+    async function fetchPokemon(query, options = {}) {
       try {
         results.classList.remove('empty');
         results.innerHTML = '<p class="message">Fetching…</p>';
         compareResults.style.display = 'none';
 
         const data = await fetchPokemonData(query);
-        showPokemon(data);
+        showPokemon(data, options);
       } catch (err) {
         showMessage(`Pokémon not found. Try a valid name or ID. (${err.message})`, true);
       }
@@ -817,7 +914,8 @@
     randomBtn.addEventListener('click', () => {
       const randomId = Math.floor(Math.random() * 1010) + 1;
       input.value = randomId;
-      fetchPokemon(randomId);
+      applyRandomTheme();
+      fetchPokemon(randomId, { showRawData: false });
     });
 
     compareBtn.addEventListener('click', comparePokemon);
